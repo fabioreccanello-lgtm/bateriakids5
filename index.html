@@ -26,7 +26,7 @@
         /* Luzes Indicadoras */
         .metronome-active {
             background-color: #eab308;
-            box-shadow: 0 0 20px #eab308;
+            box-shadow: 0 0 15px #eab308;
             transform: scale(1.1);
         }
         .indicator-idle {
@@ -36,9 +36,9 @@
         }
 
         /* Cores dos Instrumentos */
-        .neon-box-yellow { box-shadow: 0 0 15px rgba(250, 204, 21, 0.3), inset 0 0 10px rgba(250, 204, 21, 0.1); border-color: #facc15 !important; }
-        .neon-box-blue { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3), inset 0 0 10px rgba(99, 102, 241, 0.1); border-color: #6366f1 !important; }
-        .neon-box-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3), inset 0 0 10px rgba(239, 68, 68, 0.1); border-color: #ef4444 !important; }
+        .neon-box-yellow { box-shadow: 0 0 10px rgba(250, 204, 21, 0.3), inset 0 0 5px rgba(250, 204, 21, 0.1); border-color: #facc15 !important; }
+        .neon-box-blue { box-shadow: 0 0 10px rgba(99, 102, 241, 0.3), inset 0 0 5px rgba(99, 102, 241, 0.1); border-color: #6366f1 !important; }
+        .neon-box-red { box-shadow: 0 0 10px rgba(239, 68, 68, 0.3), inset 0 0 5px rgba(239, 68, 68, 0.1); border-color: #ef4444 !important; }
 
         .beat-active {
             transform: scale(1.15) translateZ(0);
@@ -65,198 +65,196 @@
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4">
+<body class="min-h-screen flex flex-col items-center p-2 md:p-4">
 
     <!-- Cabeçalho -->
-    <header class="text-center mb-6 mt-4 gpu-accelerated">
-        <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 fun-font mb-2">
+    <header class="text-center mb-6 mt-2 md:mt-4 gpu-accelerated">
+        <h1 class="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 fun-font mb-2">
             Ritmo Rock Básico
         </h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Aprenda a tocar como na partitura!</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px] md:text-xs">Aprenda a tocar como na partitura!</p>
     </header>
 
     <!-- Painel Superior: Luzes e BPM -->
     <div class="w-full max-w-4xl flex flex-col md:flex-row gap-4 justify-between items-stretch mb-6">
         
         <!-- Indicador de Pulso (Visual) -->
-        <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-2xl flex-1 flex justify-center items-center gap-6 shadow-inner">
+        <div class="bg-slate-900/80 border border-slate-700 p-3 md:p-4 rounded-2xl flex-1 flex justify-center items-center gap-4 md:gap-6 shadow-inner">
             <div class="text-right">
-                <span class="text-xs font-bold text-slate-400 uppercase block">Tempo</span>
-                <span id="beat-counter" class="text-3xl font-bold fun-font text-white">1</span>
+                <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase block">Tempo</span>
+                <span id="beat-counter" class="text-2xl md:text-3xl font-bold fun-font text-white">1</span>
             </div>
-            <div id="light-1" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
-            <div id="light-2" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
-            <div id="light-3" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
-            <div id="light-4" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-1" class="indicator-idle w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-2" class="indicator-idle w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-3" class="indicator-idle w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-4" class="indicator-idle w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
         </div>
 
         <!-- Controles Principais -->
-        <div class="bg-slate-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl flex-2 border border-slate-700 flex flex-wrap gap-4 justify-center items-center">
+        <div class="bg-slate-800/90 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl flex-2 border border-slate-700 flex flex-wrap gap-3 md:gap-4 justify-center items-center relative">
             
+            <!-- Aviso iPhone -->
+            <div class="absolute -top-3 right-4 bg-red-600 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg uppercase tracking-wider animate-pulse">
+                📱 iPhone: Desative a chave lateral de silêncio
+            </div>
+
             <!-- Botão Play -->
-            <button id="playBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg transform active:scale-95 transition flex items-center gap-2 fun-font text-xl min-w-[140px] justify-center">
+            <button id="playBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white px-5 py-2 md:px-6 md:py-3 rounded-xl font-bold shadow-lg transform active:scale-95 transition flex items-center gap-2 fun-font text-lg md:text-xl min-w-[120px] justify-center">
                 <span id="playIcon">▶</span> <span id="playText">TOCAR</span>
             </button>
 
             <!-- Controle de BPM -->
-            <div class="flex flex-col items-center bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700">
-                <div class="flex items-center gap-3 w-full justify-between mb-2">
-                    <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Velocidade (BPM)</label>
-                    <span id="bpmDisplay" class="font-mono text-xl font-bold text-blue-400 bg-slate-800 px-2 rounded">60</span>
+            <div class="flex flex-col items-center bg-slate-900/50 px-3 py-2 rounded-xl border border-slate-700 flex-1 min-w-[200px]">
+                <div class="flex items-center gap-2 w-full justify-between mb-1 md:mb-2">
+                    <label class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-wider font-bold">Velocidade (BPM)</label>
+                    <span id="bpmDisplay" class="font-mono text-lg md:text-xl font-bold text-blue-400 bg-slate-800 px-2 rounded">60</span>
                 </div>
                 
                 <div class="flex items-center gap-2 mb-2 w-full">
-                    <span class="text-sm">🐢</span>
+                    <span class="text-xs">🐢</span>
                     <input type="range" id="bpm" min="40" max="180" value="60" class="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                    <span class="text-sm">🐇</span>
+                    <span class="text-xs">🐇</span>
                 </div>
 
                 <!-- Botões Rápidos de BPM -->
-                <div class="flex gap-2 w-full justify-between">
-                    <button onclick="setBPM(60)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">60 Lento</button>
-                    <button onclick="setBPM(90)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">90 Médio</button>
-                    <button onclick="setBPM(120)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">120 Rápido</button>
+                <div class="flex gap-1 md:gap-2 w-full justify-between">
+                    <button onclick="setBPM(60)" class="text-[10px] md:text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition flex-1 text-center">60</button>
+                    <button onclick="setBPM(90)" class="text-[10px] md:text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition flex-1 text-center">90</button>
+                    <button onclick="setBPM(120)" class="text-[10px] md:text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition flex-1 text-center">120</button>
                 </div>
             </div>
 
             <!-- Botão Metrônomo Sonoro -->
-            <button id="metronomeBtn" class="bg-slate-700 border-2 border-slate-600 hover:bg-slate-600 text-white px-4 py-2 rounded-xl font-bold shadow transition flex flex-col items-center gap-1">
-                <span class="text-lg">⏱️</span> 
-                <span class="text-[10px] uppercase">Metrônomo</span>
+            <button id="metronomeBtn" class="bg-slate-700 border-2 border-slate-600 hover:bg-slate-600 text-white px-3 py-2 md:px-4 rounded-xl font-bold shadow transition flex flex-col items-center justify-center h-full">
+                <span class="text-base md:text-lg">⏱️</span> 
+                <span class="text-[8px] md:text-[10px] uppercase">Click</span>
             </button>
 
         </div>
     </div>
 
     <!-- Seletor de Desafios (Aulas) -->
-    <div class="w-full max-w-4xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-3 gpu-accelerated">
-        <button onclick="loadPreset(1)" class="bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 p-3 rounded-xl text-left transition group shadow-md relative overflow-hidden">
-            <div class="absolute top-0 right-0 bg-blue-500 text-xs px-2 py-1 rounded-bl-lg font-bold">AULA DA FOTO</div>
-            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🥁</div>
-            <h3 class="font-bold text-blue-300 fun-font text-lg">O Ritmo Campeão</h3>
-            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Bumbo e Caixa no tempo, Chimbal direto!</p>
+    <div class="w-full max-w-4xl mb-6 grid grid-cols-3 gap-2 md:gap-3 gpu-accelerated">
+        <button onclick="loadPreset(1)" class="bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 p-2 md:p-3 rounded-xl text-left transition group shadow-md relative overflow-hidden flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="hidden md:block absolute top-0 right-0 bg-blue-500 text-[10px] px-2 py-1 rounded-bl-lg font-bold">FOTO</div>
+            <div class="text-2xl md:text-3xl mb-1 group-hover:scale-110 transition origin-center md:origin-left">🥁</div>
+            <h3 class="font-bold text-blue-300 fun-font text-xs md:text-lg leading-tight">Ritmo Campeão</h3>
+            <p class="text-[9px] md:text-[11px] text-slate-400 font-bold uppercase mt-1 hidden md:block">Bumbo e Caixa no tempo</p>
         </button>
         
-        <button onclick="loadPreset(2)" class="bg-slate-800/80 hover:bg-yellow-900/40 border border-slate-700 hover:border-yellow-500 p-3 rounded-xl text-left transition group shadow-md">
-            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🚶</div>
-            <h3 class="font-bold text-yellow-300 fun-font text-lg">Passeio Suave</h3>
-            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Mais fácil: Chimbal só nos números</p>
+        <button onclick="loadPreset(2)" class="bg-slate-800/80 hover:bg-yellow-900/40 border border-slate-700 hover:border-yellow-500 p-2 md:p-3 rounded-xl text-left transition group shadow-md flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="text-2xl md:text-3xl mb-1 group-hover:scale-110 transition origin-center md:origin-left">🚶</div>
+            <h3 class="font-bold text-yellow-300 fun-font text-xs md:text-lg leading-tight">Passeio Suave</h3>
+            <p class="text-[9px] md:text-[11px] text-slate-400 font-bold uppercase mt-1 hidden md:block">Chimbal só nos números</p>
         </button>
         
-        <button onclick="loadPreset(3)" class="bg-slate-800/80 hover:bg-red-900/40 border border-slate-700 hover:border-red-500 p-3 rounded-xl text-left transition group shadow-md">
-            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🔥</div>
-            <h3 class="font-bold text-red-300 fun-font text-lg">Rock Star</h3>
-            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Dois bumbos seguidos para animar</p>
+        <button onclick="loadPreset(3)" class="bg-slate-800/80 hover:bg-red-900/40 border border-slate-700 hover:border-red-500 p-2 md:p-3 rounded-xl text-left transition group shadow-md flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="text-2xl md:text-3xl mb-1 group-hover:scale-110 transition origin-center md:origin-left">🔥</div>
+            <h3 class="font-bold text-red-300 fun-font text-xs md:text-lg leading-tight">Rock Star</h3>
+            <p class="text-[9px] md:text-[11px] text-slate-400 font-bold uppercase mt-1 hidden md:block">Dois bumbos seguidos</p>
         </button>
     </div>
 
-    <!-- SEQUENCIADOR (GRID) -->
-    <div class="bg-slate-800 p-4 rounded-3xl shadow-2xl border border-slate-700 w-full max-w-4xl overflow-x-auto relative mb-6">
-        <div class="min-w-[700px] pr-4">
+    <!-- SEQUENCIADOR (GRID) 100% RESPONSIVO -->
+    <!-- Removido o overflow-x-auto, agora ele espreme de forma flexível -->
+    <div class="bg-slate-800 p-2 md:p-4 rounded-2xl md:rounded-3xl shadow-2xl border border-slate-700 w-full max-w-4xl relative mb-6">
+        <div class="w-full">
             
-            <div class="flex justify-between items-end mb-2 ml-24 pr-2">
-                <span class="text-xs text-slate-500 font-bold">TEMPO:</span>
-                <button id="clearBtn" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 text-xs font-bold border border-red-900/50 px-3 py-1 rounded-lg transition">LIMPAR TUDO</button>
+            <div class="flex justify-between items-end mb-2 ml-[58px] md:ml-[108px] pr-1 md:pr-2">
+                <span class="text-[9px] md:text-xs text-slate-500 font-bold">TEMPO:</span>
+                <button id="clearBtn" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 text-[9px] md:text-xs font-bold border border-red-900/50 px-2 py-1 rounded transition">LIMPAR</button>
             </div>
 
-            <!-- Marcadores de Tempo (Estilo da Foto) -->
-            <div class="flex mb-3 ml-24 border-b-2 border-slate-600 pb-2">
-                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">1</div>
-                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
-                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">2</div>
-                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
-                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">3</div>
-                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
-                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">4</div>
-                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
+            <!-- Marcadores de Tempo (Alinhados dinamicamente) -->
+            <div class="flex mb-2 md:mb-3 ml-[58px] md:ml-[108px] border-b border-slate-600 pb-1 md:pb-2">
+                <div class="flex-1 text-center text-slate-300 font-bold text-sm md:text-2xl fun-font bg-slate-900/50 rounded-t mx-0.5 md:mx-1 pt-1">1</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-xs md:text-lg pt-1.5 md:pt-2 mx-0.5 md:mx-1">e</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-sm md:text-2xl fun-font bg-slate-900/50 rounded-t mx-0.5 md:mx-1 pt-1">2</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-xs md:text-lg pt-1.5 md:pt-2 mx-0.5 md:mx-1">e</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-sm md:text-2xl fun-font bg-slate-900/50 rounded-t mx-0.5 md:mx-1 pt-1">3</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-xs md:text-lg pt-1.5 md:pt-2 mx-0.5 md:mx-1">e</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-sm md:text-2xl fun-font bg-slate-900/50 rounded-t mx-0.5 md:mx-1 pt-1">4</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-xs md:text-lg pt-1.5 md:pt-2 mx-0.5 md:mx-1">e</div>
             </div>
 
             <!-- LINHA CHIMBAL -->
-            <div class="flex items-center mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
-                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
-                    <span class="text-3xl block drop-shadow-md">🟡</span>
-                    <span class="text-[10px] font-bold text-yellow-400 uppercase mt-1">CHIMBAL</span>
+            <div class="flex items-center mb-2 md:mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50">
+                <div class="w-[50px] md:w-[100px] flex-shrink-0 text-center border-r border-slate-700 mr-1 md:mr-2 flex flex-col items-center justify-center">
+                    <span class="text-xl md:text-3xl block drop-shadow-md">🟡</span>
+                    <span class="text-[7px] md:text-[10px] font-bold text-yellow-400 uppercase mt-1 hidden md:block">CHIMBAL</span>
                 </div>
-                <div id="row-hihat" class="flex-1 flex gap-2"></div>
+                <div id="row-hihat" class="flex-1 flex gap-1 md:gap-2"></div>
             </div>
 
             <!-- LINHA CAIXA -->
-            <div class="flex items-center mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
-                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
-                    <span class="text-3xl block drop-shadow-md">🔵</span>
-                    <span class="text-[10px] font-bold text-blue-400 uppercase mt-1">CAIXA</span>
+            <div class="flex items-center mb-2 md:mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50">
+                <div class="w-[50px] md:w-[100px] flex-shrink-0 text-center border-r border-slate-700 mr-1 md:mr-2 flex flex-col items-center justify-center">
+                    <span class="text-xl md:text-3xl block drop-shadow-md">🔵</span>
+                    <span class="text-[7px] md:text-[10px] font-bold text-blue-400 uppercase mt-1 hidden md:block">CAIXA</span>
                 </div>
-                <div id="row-snare" class="flex-1 flex gap-2"></div>
+                <div id="row-snare" class="flex-1 flex gap-1 md:gap-2"></div>
             </div>
 
             <!-- LINHA BUMBO -->
-            <div class="flex items-center p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
-                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
-                    <span class="text-3xl block drop-shadow-md">🔴</span>
-                    <span class="text-[10px] font-bold text-red-400 uppercase mt-1">BUMBO</span>
+            <div class="flex items-center p-1 rounded-lg bg-slate-900/40 border border-slate-700/50">
+                <div class="w-[50px] md:w-[100px] flex-shrink-0 text-center border-r border-slate-700 mr-1 md:mr-2 flex flex-col items-center justify-center">
+                    <span class="text-xl md:text-3xl block drop-shadow-md">🔴</span>
+                    <span class="text-[7px] md:text-[10px] font-bold text-red-400 uppercase mt-1 hidden md:block">BUMBO</span>
                 </div>
-                <div id="row-kick" class="flex-1 flex gap-2"></div>
+                <div id="row-kick" class="flex-1 flex gap-1 md:gap-2"></div>
             </div>
         </div>
     </div>
 
     <!-- INSTRUÇÕES -->
-    <div class="w-full max-w-4xl bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-lg gpu-accelerated mb-8">
-        <h3 class="text-white font-bold fun-font text-xl mb-3 flex items-center gap-2">
+    <div class="w-full max-w-4xl bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-blue-500 p-4 md:p-5 rounded-r-xl shadow-lg gpu-accelerated mb-8">
+        <h3 class="text-white font-bold fun-font text-lg md:text-xl mb-3 flex items-center gap-2">
             <span>💡</span> COMO LER A PARTITURA DA FOTO
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm text-slate-300">
             <div>
                 <ul class="space-y-2">
-                    <li><strong class="text-yellow-400">Linha de Cima (X):</strong> É o <strong>Chimbal</strong>. Ele toca o tempo todo na contagem (1 E 2 E 3 E 4 E).</li>
+                    <li><strong class="text-yellow-400">Linha de Cima (X):</strong> É o <strong>Chimbal</strong>. Ele toca o tempo todo na contagem.</li>
                     <li><strong class="text-blue-400">Linha do Meio (Bolinha):</strong> É a <strong>Caixa</strong>. O som forte que marca os tempos 2 e 4.</li>
                     <li><strong class="text-red-400">Linha de Baixo (Bolinha):</strong> É o <strong>Bumbo</strong>. O pé direito que pisa forte nos tempos 1 e 3.</li>
                 </ul>
             </div>
             <div class="bg-slate-800 p-3 rounded border border-slate-700">
                 <p class="font-bold text-white mb-1">Dica de Estudo:</p>
-                <p>Ligue o <strong>Metrônomo</strong> e coloque a velocidade no <strong class="text-green-400">60 BPM</strong>. Tente cantar junto: <em>"BUM, tss, TÁ, tss, BUM, tss, TÁ, tss"</em> antes de tentar tocar de verdade!</p>
+                <p>Ligue o <strong>Metrônomo</strong> e coloque a velocidade no <strong class="text-green-400">60 BPM</strong>. Tente cantar junto: <em>"BUM, tss, TÁ, tss..."</em> antes de tocar!</p>
             </div>
         </div>
     </div>
 
     <!-- SOBRE A AULA -->
-    <div class="w-full max-w-4xl bg-slate-800/80 border border-slate-700 p-6 rounded-2xl shadow-xl gpu-accelerated mb-12">
-        <h3 class="text-white font-bold fun-font text-2xl mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+    <div class="w-full max-w-4xl bg-slate-800/80 border border-slate-700 p-4 md:p-6 rounded-2xl shadow-xl gpu-accelerated mb-12">
+        <h3 class="text-white font-bold fun-font text-xl md:text-2xl mb-4 flex items-center gap-2 border-b border-slate-700 pb-2 md:pb-3">
             <span>📖</span> Sobre esta Aula
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:text-base text-slate-300 leading-relaxed">
             
-            <!-- Coluna 1 -->
             <div class="space-y-4">
                 <div>
                     <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">O que é este ritmo?</h4>
-                    <p>Este é o <strong>Ritmo de Rock Básico em 4/4</strong> (também chamado de "compasso de colcheias"). É o alicerce absoluto da bateria moderna. Quem domina esse ritmo já pode tocar numa banda!</p>
+                    <p>Este é o <strong>Ritmo de Rock Básico em 4/4</strong>. É o alicerce absoluto da bateria moderna. Quem domina esse ritmo já pode tocar numa banda!</p>
                 </div>
                 
                 <div>
                     <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">Para quem é?</h4>
-                    <p>Perfeito para <strong>crianças a partir de 5 ou 6 anos</strong> e qualquer adulto que esteja a começar do zero. Ajuda muito a desenvolver a coordenação motora (independência entre as mãos e o pé).</p>
-                </div>
-
-                <div>
-                    <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">Onde aplicar?</h4>
-                    <p>Este ritmo exato é usado em milhões de músicas pelo mundo! Vai ouvi-lo no Pop, Rock, Funk, e em variados estilos. Músicas famosas como <em>"Billie Jean"</em> (Michael Jackson) e <em>"Back in Black"</em> (AC/DC) usam este mesmo esqueleto.</p>
+                    <p>Perfeito para <strong>crianças a partir de 5 ou 6 anos</strong> e qualquer adulto que esteja a começar do zero.</p>
                 </div>
             </div>
 
-            <!-- Coluna 2 -->
             <div class="space-y-4 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
                 <div>
                     <h4 class="text-green-400 font-bold mb-2 uppercase text-xs tracking-wider flex items-center gap-1">
                         <span>💪</span> Como Treinar (Passo a Passo)
                     </h4>
                     <ul class="list-decimal list-inside space-y-2 text-sm">
-                        <li><strong>Conte em voz alta:</strong> "1 e 2 e 3 e 4 e" repetidamente.</li>
+                        <li><strong>Conte em voz alta:</strong> "1 e 2 e 3 e 4 e".</li>
                         <li><strong>Só as mãos:</strong> Toque primeiro só o Chimbal e a Caixa.</li>
-                        <li><strong>Coloque o pé:</strong> Adicione o Bumbo (nos tempos 1 e 3) bem devagar.</li>
-                        <li><strong>Não pare:</strong> O segredo da bateria é a fluidez, não deixe o ritmo "engasgar".</li>
+                        <li><strong>Coloque o pé:</strong> Adicione o Bumbo bem devagar.</li>
                     </ul>
                 </div>
 
@@ -264,20 +262,18 @@
                     <h4 class="text-yellow-400 font-bold mb-1 uppercase text-xs tracking-wider flex items-center gap-1">
                         <span>🏆</span> O Desafio do Campeão
                     </h4>
-                    <p class="text-sm">
-                        Coloque o simulador em <strong class="text-white">60 BPM</strong>. O aluno deve tentar tocar o compasso inteiro <strong>4 a 8 vezes seguidas</strong> (repetições) sem parar e sem errar. 
-                        Conseguiu? Aumente para 70 BPM e tente de novo!
+                    <p class="text-xs md:text-sm">
+                        Coloque em <strong class="text-white">60 BPM</strong>. O aluno deve tentar tocar <strong>4 a 8 vezes seguidas</strong> sem errar.
                     </p>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- SVGs Ocultos para as notas no Grid -->
     <div style="display:none;">
         <!-- CHIMBAL (Amarelo) -->
-        <svg id="svg-hihat" viewBox="0 0 100 100" class="w-full h-full p-2">
+        <svg id="svg-hihat" viewBox="0 0 100 100" class="w-full h-full p-1 md:p-2">
             <line x1="50" y1="20" x2="50" y2="90" stroke="#9ca3af" stroke-width="3"/>
             <line x1="30" y1="90" x2="70" y2="90" stroke="#9ca3af" stroke-width="3"/>
             <line x1="50" y1="80" x2="70" y2="95" stroke="#9ca3af" stroke-width="3"/>
@@ -286,7 +282,7 @@
         </svg>
 
         <!-- CAIXA (Azul) -->
-        <svg id="svg-snare" viewBox="0 0 100 100" class="w-full h-full p-2">
+        <svg id="svg-snare" viewBox="0 0 100 100" class="w-full h-full p-1 md:p-2">
             <path d="M50 60 L30 90 M50 60 L70 90" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
             <rect x="20" y="35" width="60" height="25" rx="3" fill="#E0E7FF" stroke="#4F46E5" stroke-width="3"/>
             <line x1="20" y1="47" x2="80" y2="47" stroke="#4F46E5" stroke-width="1"/>
@@ -294,7 +290,7 @@
         </svg>
 
         <!-- BUMBO (Vermelho) -->
-        <svg id="svg-kick" viewBox="0 0 100 100" class="w-full h-full p-2">
+        <svg id="svg-kick" viewBox="0 0 100 100" class="w-full h-full p-1 md:p-2">
             <circle cx="50" cy="50" r="35" fill="#FEE2E2" stroke="#DC2626" stroke-width="4"/>
             <circle cx="50" cy="50" r="30" stroke="#DC2626" stroke-width="1" stroke-dasharray="4 4"/>
             <rect x="55" y="60" width="10" height="25" rx="2" fill="#374151" transform="rotate(-15 55 80)"/>
@@ -302,7 +298,7 @@
         </svg>
 
         <!-- Vazio (Traço) -->
-        <svg id="svg-empty" viewBox="0 0 100 100" class="w-full h-full opacity-20">
+        <svg id="svg-empty" viewBox="0 0 100 100" class="w-full h-full opacity-20 p-1 md:p-2">
             <circle cx="50" cy="50" r="10" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 2"/>
         </svg>
     </div>
@@ -310,6 +306,28 @@
     <script>
         // --- MOTOR DE ÁUDIO ---
         let audioCtx;
+        
+        // HACK PARA iOS: Desbloqueia o áudio no primeiro toque na tela
+        let audioUnlocked = false;
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Toca um som vazio, isso destrava o motor do iOS
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+            
+            audioUnlocked = true;
+            document.body.removeEventListener('touchstart', unlockAudio);
+            document.body.removeEventListener('click', unlockAudio);
+        }
+        document.body.addEventListener('touchstart', unlockAudio, false);
+        document.body.addEventListener('click', unlockAudio, false);
+
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -327,13 +345,12 @@
             bandpass.type = 'bandpass'; bandpass.frequency.value = 10000;
             const gain = audioCtx.createGain();
             noise.connect(bandpass); bandpass.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.5, time); // Volume chimbal
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05); // Som curtinho (fechado)
+            gain.gain.setValueAtTime(0.5, time);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05); 
             noise.start(time);
         }
 
         function playSnare(time) {
-            // Ruído da esteira
             const bufferSize = audioCtx.sampleRate * 0.2; 
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
@@ -348,7 +365,6 @@
             noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
             noise.start(time);
 
-            // Corpo do tambor
             const osc = audioCtx.createOscillator();
             const oscGain = audioCtx.createGain();
             osc.type = 'triangle';
@@ -364,9 +380,9 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(150, time); // Ataque
-            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5); // Grave descendo
-            gain.gain.setValueAtTime(1, time); // Volume forte
+            osc.frequency.setValueAtTime(150, time); 
+            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5); 
+            gain.gain.setValueAtTime(1, time); 
             gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
             osc.start(time); osc.stop(time + 0.5);
         }
@@ -384,7 +400,7 @@
         }
 
         // --- ESTADO DA APLICAÇÃO ---
-        const STEPS = 8; // 8 colcheias no compasso (1 E 2 E 3 E 4 E)
+        const STEPS = 8;
         let isPlaying = false;
         let isMetronomeOn = false;
         let currentStep = 0;
@@ -402,15 +418,15 @@
         const svgKick = document.getElementById('svg-kick').outerHTML;
         const svgEmpty = document.getElementById('svg-empty').outerHTML;
 
-        // Renderiza botões no Grid
+        // Renderiza botões no Grid - AGORA RESPONSIVO (h-10 para mobile, h-16 para desktop)
         function createRow(inst, id, activeSvg) {
             const container = document.getElementById(id);
             container.innerHTML = '';
             grid[inst].forEach((state, i) => {
                 const btn = document.createElement('button');
-                const isMainBeat = i % 2 === 0; // Os números (1, 2, 3, 4)
+                const isMainBeat = i % 2 === 0; 
                 
-                let cls = "grid-btn relative w-full h-16 md:h-20 rounded-xl flex items-center justify-center border-2 overflow-hidden mx-1 ";
+                let cls = "grid-btn relative w-full h-10 md:h-16 rounded-md md:rounded-xl flex items-center justify-center border md:border-2 overflow-hidden mx-0.5 md:mx-1 ";
                 
                 if (inst === 'hihat') cls += state ? "neon-box-yellow bg-yellow-900/30 border-yellow-500" : (isMainBeat ? "border-slate-600 bg-slate-700/30" : "border-slate-800 bg-slate-800/50 opacity-40");
                 else if (inst === 'snare') cls += state ? "neon-box-blue bg-blue-900/30 border-blue-500" : (isMainBeat ? "border-slate-600 bg-slate-700/30" : "border-slate-800 bg-slate-800/50 opacity-40");
@@ -431,60 +447,49 @@
         }
 
         function nextNote() {
-            // Em 4/4 com colcheias, cada passo é meia batida (0.5 * tempo da semínima)
             const secondsPerBeat = 60.0 / bpm;
             nextNoteTime += 0.5 * secondsPerBeat;
             currentStep = (currentStep + 1) % STEPS;
         }
 
         function scheduleNote(step, time) {
-            // Toca os instrumentos
             if (grid.kick[step]) playKick(time);
             if (grid.snare[step]) playSnare(time);
             if (grid.hihat[step]) playHiHat(time);
             
-            // Lógica do Metrônomo Sonoro (toca nos tempos 0, 2, 4, 6 que equivalem a 1, 2, 3, 4)
             if (isMetronomeOn && step % 2 === 0) {
-                const isAccent = (step === 0); // Mais agudo no tempo 1
+                const isAccent = (step === 0); 
                 playClick(time, isAccent);
             }
 
-            // Animações Visuais (com delay para sincronizar com o áudio gerado no futuro)
             const delay = (time - audioCtx.currentTime) * 1000;
-            setTimeout(() => {
-                updateVisuals(step);
-            }, delay);
+            setTimeout(() => { updateVisuals(step); }, delay);
         }
 
         function updateVisuals(step) {
-            // Atualiza número do tempo na tela (1, 2, 3 ou 4)
             if (step % 2 === 0) {
                 const beatNumber = (step / 2) + 1;
                 document.getElementById('beat-counter').innerText = beatNumber;
                 
-                // Atualiza luzes do metrônomo visual
                 for(let i=1; i<=4; i++) {
                     const light = document.getElementById(`light-${i}`);
                     if(i === beatNumber) {
-                        light.className = "metronome-active w-6 h-6 rounded-full border-2 border-yellow-200 transition-all duration-75";
-                        setTimeout(() => { light.className = "indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-300"; }, 150);
+                        light.className = "metronome-active w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-yellow-200 transition-all duration-75";
+                        setTimeout(() => { light.className = "indicator-idle w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-slate-600 transition-all duration-300"; }, 150);
                     }
                 }
             } else {
-                document.getElementById('beat-counter').innerText = "&"; // O "E"
+                document.getElementById('beat-counter').innerText = "&";
             }
 
-            // Piscar os botões ativos no grid
             ['hihat', 'snare', 'kick'].forEach(inst => {
                 const el = document.getElementById(`c-${inst}-${step}`);
-                // Adiciona um highlight leve em toda a coluna
                 if(el) {
                     const originalBg = el.style.backgroundColor;
                     el.style.backgroundColor = 'rgba(255,255,255,0.2)';
                     setTimeout(() => el.style.backgroundColor = originalBg, 100);
                 }
 
-                // Se tiver nota, anima o ícone
                 if (el && grid[inst][step]) {
                     const svg = el.querySelector('svg');
                     if(svg) {
@@ -496,7 +501,6 @@
         }
 
         function scheduler() {
-            // Agenda notas um pouco antes do tempo exato para garantir fluidez
             while (nextNoteTime < audioCtx.currentTime + 0.1) {
                 scheduleNote(currentStep, nextNoteTime);
                 nextNote();
@@ -505,6 +509,7 @@
         }
 
         function play() {
+            unlockAudio(); // Garante o desbloqueio manual se falhou
             initAudio();
             isPlaying = !isPlaying;
             const btn = document.getElementById('playBtn');
@@ -533,6 +538,8 @@
         }
 
         function toggleMetronome() {
+            unlockAudio();
+            initAudio();
             isMetronomeOn = !isMetronomeOn;
             const btn = document.getElementById('metronomeBtn');
             if(isMetronomeOn) {
@@ -550,27 +557,22 @@
             document.getElementById('bpmDisplay').innerText = bpm;
         }
 
-        // --- PRESETS (AULAS) ---
-        // Índice:  0(1), 1(E), 2(2), 3(E), 4(3), 5(E), 6(4), 7(E)
         function loadPreset(id) {
             grid.hihat.fill(0); grid.snare.fill(0); grid.kick.fill(0);
 
             if (id === 1) { 
-                // AULA DA FOTO: Ritmo Campeão (Basic Rock Beat)
-                grid.hihat = [1,1,1,1,1,1,1,1]; // Chimbal em todos
-                grid.kick  = [1,0,0,0,1,0,0,0]; // Bumbo no 1 e 3 (indices 0 e 4)
-                grid.snare = [0,0,1,0,0,0,1,0]; // Caixa no 2 e 4 (indices 2 e 6)
+                grid.hihat = [1,1,1,1,1,1,1,1]; 
+                grid.kick  = [1,0,0,0,1,0,0,0]; 
+                grid.snare = [0,0,1,0,0,0,1,0]; 
                 setBPM(60);
             } else if (id === 2) { 
-                // PASSEIO SUAVE: Mais simples para crianças iniciantes
-                grid.hihat = [1,0,1,0,1,0,1,0]; // Chimbal só nos números (Semínimas)
-                grid.kick  = [1,0,0,0,1,0,0,0]; // Bumbo 1 e 3
-                grid.snare = [0,0,1,0,0,0,1,0]; // Caixa 2 e 4
+                grid.hihat = [1,0,1,0,1,0,1,0]; 
+                grid.kick  = [1,0,0,0,1,0,0,0]; 
+                grid.snare = [0,0,1,0,0,0,1,0]; 
                 setBPM(75);
             } else if (id === 3) { 
-                // ROCK STAR: Variação legal de Bumbo
                 grid.hihat = [1,1,1,1,1,1,1,1]; 
-                grid.kick  = [1,1,0,0,1,0,0,0]; // Bumbo duplo no 1 e "E" (indices 0 e 1)
+                grid.kick  = [1,1,0,0,1,0,0,0]; 
                 grid.snare = [0,0,1,0,0,0,1,0]; 
                 setBPM(90);
             }
@@ -585,7 +587,7 @@
 
         // Inicialização
         render();
-        loadPreset(1); // Já começa carregado com a aula da foto!
+        loadPreset(1);
     </script>
 </body>
 </html>
