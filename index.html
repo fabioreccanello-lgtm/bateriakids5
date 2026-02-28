@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Bateria - Ritmo Rock</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* IDENTIDADE VISUAL NEON */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0f172a;
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        h1, h2, h3, .fun-font { font-family: 'Fredoka', cursive; }
+        .gpu-accelerated { transform: translateZ(0); will-change: transform; }
+        .neon-text { text-shadow: 0 0 10px rgba(148, 163, 184, 0.6); }
+        
+        /* Luzes Indicadoras */
+        .metronome-active {
+            background-color: #eab308;
+            box-shadow: 0 0 20px #eab308;
+            transform: scale(1.1);
+        }
+        .indicator-idle {
+            background-color: #1e293b;
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        /* Cores dos Instrumentos */
+        .neon-box-yellow { box-shadow: 0 0 15px rgba(250, 204, 21, 0.3), inset 0 0 10px rgba(250, 204, 21, 0.1); border-color: #facc15 !important; }
+        .neon-box-blue { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3), inset 0 0 10px rgba(99, 102, 241, 0.1); border-color: #6366f1 !important; }
+        .neon-box-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3), inset 0 0 10px rgba(239, 68, 68, 0.1); border-color: #ef4444 !important; }
+
+        .beat-active {
+            transform: scale(1.15) translateZ(0);
+            filter: brightness(1.5);
+            z-index: 20;
+            transition: transform 0.05s ease-out;
+        }
+
+        .grid-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(0);
+        }
+        .grid-btn:active { transform: scale(0.95); }
+
+        /* Estilo para Botão Metrônomo Ativo */
+        .btn-metronome-on {
+            background: linear-gradient(to right, #d97706, #b45309);
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
+            border-color: #f59e0b;
+        }
+
+        ::-webkit-scrollbar { height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Cabeçalho -->
+    <header class="text-center mb-6 mt-4 gpu-accelerated">
+        <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 fun-font mb-2">
+            Ritmo Rock Básico
+        </h1>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Aprenda a tocar como na partitura!</p>
+    </header>
+
+    <!-- Painel Superior: Luzes e BPM -->
+    <div class="w-full max-w-4xl flex flex-col md:flex-row gap-4 justify-between items-stretch mb-6">
+        
+        <!-- Indicador de Pulso (Visual) -->
+        <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-2xl flex-1 flex justify-center items-center gap-6 shadow-inner">
+            <div class="text-right">
+                <span class="text-xs font-bold text-slate-400 uppercase block">Tempo</span>
+                <span id="beat-counter" class="text-3xl font-bold fun-font text-white">1</span>
+            </div>
+            <div id="light-1" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-2" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-3" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+            <div id="light-4" class="indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-75"></div>
+        </div>
+
+        <!-- Controles Principais -->
+        <div class="bg-slate-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl flex-2 border border-slate-700 flex flex-wrap gap-4 justify-center items-center">
+            
+            <!-- Botão Play -->
+            <button id="playBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg transform active:scale-95 transition flex items-center gap-2 fun-font text-xl min-w-[140px] justify-center">
+                <span id="playIcon">▶</span> <span id="playText">TOCAR</span>
+            </button>
+
+            <!-- Controle de BPM -->
+            <div class="flex flex-col items-center bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700">
+                <div class="flex items-center gap-3 w-full justify-between mb-2">
+                    <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Velocidade (BPM)</label>
+                    <span id="bpmDisplay" class="font-mono text-xl font-bold text-blue-400 bg-slate-800 px-2 rounded">60</span>
+                </div>
+                
+                <div class="flex items-center gap-2 mb-2 w-full">
+                    <span class="text-sm">🐢</span>
+                    <input type="range" id="bpm" min="40" max="180" value="60" class="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    <span class="text-sm">🐇</span>
+                </div>
+
+                <!-- Botões Rápidos de BPM -->
+                <div class="flex gap-2 w-full justify-between">
+                    <button onclick="setBPM(60)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">60 Lento</button>
+                    <button onclick="setBPM(90)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">90 Médio</button>
+                    <button onclick="setBPM(120)" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition">120 Rápido</button>
+                </div>
+            </div>
+
+            <!-- Botão Metrônomo Sonoro -->
+            <button id="metronomeBtn" class="bg-slate-700 border-2 border-slate-600 hover:bg-slate-600 text-white px-4 py-2 rounded-xl font-bold shadow transition flex flex-col items-center gap-1">
+                <span class="text-lg">⏱️</span> 
+                <span class="text-[10px] uppercase">Metrônomo</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Seletor de Desafios (Aulas) -->
+    <div class="w-full max-w-4xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-3 gpu-accelerated">
+        <button onclick="loadPreset(1)" class="bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 p-3 rounded-xl text-left transition group shadow-md relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-blue-500 text-xs px-2 py-1 rounded-bl-lg font-bold">AULA DA FOTO</div>
+            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🥁</div>
+            <h3 class="font-bold text-blue-300 fun-font text-lg">O Ritmo Campeão</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Bumbo e Caixa no tempo, Chimbal direto!</p>
+        </button>
+        
+        <button onclick="loadPreset(2)" class="bg-slate-800/80 hover:bg-yellow-900/40 border border-slate-700 hover:border-yellow-500 p-3 rounded-xl text-left transition group shadow-md">
+            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🚶</div>
+            <h3 class="font-bold text-yellow-300 fun-font text-lg">Passeio Suave</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Mais fácil: Chimbal só nos números</p>
+        </button>
+        
+        <button onclick="loadPreset(3)" class="bg-slate-800/80 hover:bg-red-900/40 border border-slate-700 hover:border-red-500 p-3 rounded-xl text-left transition group shadow-md">
+            <div class="text-3xl mb-1 group-hover:scale-110 transition origin-left">🔥</div>
+            <h3 class="font-bold text-red-300 fun-font text-lg">Rock Star</h3>
+            <p class="text-[11px] text-slate-400 font-bold uppercase mt-1">Dois bumbos seguidos para animar</p>
+        </button>
+    </div>
+
+    <!-- SEQUENCIADOR (GRID) -->
+    <div class="bg-slate-800 p-4 rounded-3xl shadow-2xl border border-slate-700 w-full max-w-4xl overflow-x-auto relative mb-6">
+        <div class="min-w-[700px] pr-4">
+            
+            <div class="flex justify-between items-end mb-2 ml-24 pr-2">
+                <span class="text-xs text-slate-500 font-bold">TEMPO:</span>
+                <button id="clearBtn" class="text-red-400 hover:text-red-300 hover:bg-red-900/30 text-xs font-bold border border-red-900/50 px-3 py-1 rounded-lg transition">LIMPAR TUDO</button>
+            </div>
+
+            <!-- Marcadores de Tempo (Estilo da Foto) -->
+            <div class="flex mb-3 ml-24 border-b-2 border-slate-600 pb-2">
+                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">1</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">2</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">3</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
+                <div class="flex-1 text-center text-slate-300 font-bold text-2xl fun-font bg-slate-900/50 rounded-t mx-1 pt-1">4</div>
+                <div class="flex-1 text-center text-slate-500 font-bold text-lg pt-2 mx-1">E</div>
+            </div>
+
+            <!-- LINHA CHIMBAL -->
+            <div class="flex items-center mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
+                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
+                    <span class="text-3xl block drop-shadow-md">🟡</span>
+                    <span class="text-[10px] font-bold text-yellow-400 uppercase mt-1">CHIMBAL</span>
+                </div>
+                <div id="row-hihat" class="flex-1 flex gap-2"></div>
+            </div>
+
+            <!-- LINHA CAIXA -->
+            <div class="flex items-center mb-3 p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
+                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
+                    <span class="text-3xl block drop-shadow-md">🔵</span>
+                    <span class="text-[10px] font-bold text-blue-400 uppercase mt-1">CAIXA</span>
+                </div>
+                <div id="row-snare" class="flex-1 flex gap-2"></div>
+            </div>
+
+            <!-- LINHA BUMBO -->
+            <div class="flex items-center p-1 rounded-lg bg-slate-900/40 border border-slate-700/50 hover:bg-slate-900/60 transition">
+                <div class="w-24 text-center border-r border-slate-700 mr-2 flex flex-col items-center justify-center">
+                    <span class="text-3xl block drop-shadow-md">🔴</span>
+                    <span class="text-[10px] font-bold text-red-400 uppercase mt-1">BUMBO</span>
+                </div>
+                <div id="row-kick" class="flex-1 flex gap-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTRUÇÕES -->
+    <div class="w-full max-w-4xl bg-gradient-to-r from-slate-800 to-slate-900 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-lg gpu-accelerated mb-8">
+        <h3 class="text-white font-bold fun-font text-xl mb-3 flex items-center gap-2">
+            <span>💡</span> COMO LER A PARTITURA DA FOTO
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
+            <div>
+                <ul class="space-y-2">
+                    <li><strong class="text-yellow-400">Linha de Cima (X):</strong> É o <strong>Chimbal</strong>. Ele toca o tempo todo na contagem (1 E 2 E 3 E 4 E).</li>
+                    <li><strong class="text-blue-400">Linha do Meio (Bolinha):</strong> É a <strong>Caixa</strong>. O som forte que marca os tempos 2 e 4.</li>
+                    <li><strong class="text-red-400">Linha de Baixo (Bolinha):</strong> É o <strong>Bumbo</strong>. O pé direito que pisa forte nos tempos 1 e 3.</li>
+                </ul>
+            </div>
+            <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                <p class="font-bold text-white mb-1">Dica de Estudo:</p>
+                <p>Ligue o <strong>Metrônomo</strong> e coloque a velocidade no <strong class="text-green-400">60 BPM</strong>. Tente cantar junto: <em>"BUM, tss, TÁ, tss, BUM, tss, TÁ, tss"</em> antes de tentar tocar de verdade!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOBRE A AULA -->
+    <div class="w-full max-w-4xl bg-slate-800/80 border border-slate-700 p-6 rounded-2xl shadow-xl gpu-accelerated mb-12">
+        <h3 class="text-white font-bold fun-font text-2xl mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+            <span>📖</span> Sobre esta Aula
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:text-base text-slate-300 leading-relaxed">
+            
+            <!-- Coluna 1 -->
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">O que é este ritmo?</h4>
+                    <p>Este é o <strong>Ritmo de Rock Básico em 4/4</strong> (também chamado de "compasso de colcheias"). É o alicerce absoluto da bateria moderna. Quem domina esse ritmo já pode tocar numa banda!</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">Para quem é?</h4>
+                    <p>Perfeito para <strong>crianças a partir de 5 ou 6 anos</strong> e qualquer adulto que esteja a começar do zero. Ajuda muito a desenvolver a coordenação motora (independência entre as mãos e o pé).</p>
+                </div>
+
+                <div>
+                    <h4 class="text-blue-400 font-bold mb-1 uppercase text-xs tracking-wider">Onde aplicar?</h4>
+                    <p>Este ritmo exato é usado em milhões de músicas pelo mundo! Vai ouvi-lo no Pop, Rock, Funk, e em variados estilos. Músicas famosas como <em>"Billie Jean"</em> (Michael Jackson) e <em>"Back in Black"</em> (AC/DC) usam este mesmo esqueleto.</p>
+                </div>
+            </div>
+
+            <!-- Coluna 2 -->
+            <div class="space-y-4 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+                <div>
+                    <h4 class="text-green-400 font-bold mb-2 uppercase text-xs tracking-wider flex items-center gap-1">
+                        <span>💪</span> Como Treinar (Passo a Passo)
+                    </h4>
+                    <ul class="list-decimal list-inside space-y-2 text-sm">
+                        <li><strong>Conte em voz alta:</strong> "1 e 2 e 3 e 4 e" repetidamente.</li>
+                        <li><strong>Só as mãos:</strong> Toque primeiro só o Chimbal e a Caixa.</li>
+                        <li><strong>Coloque o pé:</strong> Adicione o Bumbo (nos tempos 1 e 3) bem devagar.</li>
+                        <li><strong>Não pare:</strong> O segredo da bateria é a fluidez, não deixe o ritmo "engasgar".</li>
+                    </ul>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <h4 class="text-yellow-400 font-bold mb-1 uppercase text-xs tracking-wider flex items-center gap-1">
+                        <span>🏆</span> O Desafio do Campeão
+                    </h4>
+                    <p class="text-sm">
+                        Coloque o simulador em <strong class="text-white">60 BPM</strong>. O aluno deve tentar tocar o compasso inteiro <strong>4 a 8 vezes seguidas</strong> (repetições) sem parar e sem errar. 
+                        Conseguiu? Aumente para 70 BPM e tente de novo!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SVGs Ocultos para as notas no Grid -->
+    <div style="display:none;">
+        <!-- CHIMBAL (Amarelo) -->
+        <svg id="svg-hihat" viewBox="0 0 100 100" class="w-full h-full p-2">
+            <line x1="50" y1="20" x2="50" y2="90" stroke="#9ca3af" stroke-width="3"/>
+            <line x1="30" y1="90" x2="70" y2="90" stroke="#9ca3af" stroke-width="3"/>
+            <line x1="50" y1="80" x2="70" y2="95" stroke="#9ca3af" stroke-width="3"/>
+            <ellipse cx="50" cy="40" rx="35" ry="6" fill="#fef08a" stroke="#eab308" stroke-width="2"/>
+            <ellipse cx="50" cy="35" rx="35" ry="6" fill="#fef08a" stroke="#eab308" stroke-width="2"/>
+        </svg>
+
+        <!-- CAIXA (Azul) -->
+        <svg id="svg-snare" viewBox="0 0 100 100" class="w-full h-full p-2">
+            <path d="M50 60 L30 90 M50 60 L70 90" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+            <rect x="20" y="35" width="60" height="25" rx="3" fill="#E0E7FF" stroke="#4F46E5" stroke-width="3"/>
+            <line x1="20" y1="47" x2="80" y2="47" stroke="#4F46E5" stroke-width="1"/>
+            <line x1="35" y1="15" x2="65" y2="35" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+
+        <!-- BUMBO (Vermelho) -->
+        <svg id="svg-kick" viewBox="0 0 100 100" class="w-full h-full p-2">
+            <circle cx="50" cy="50" r="35" fill="#FEE2E2" stroke="#DC2626" stroke-width="4"/>
+            <circle cx="50" cy="50" r="30" stroke="#DC2626" stroke-width="1" stroke-dasharray="4 4"/>
+            <rect x="55" y="60" width="10" height="25" rx="2" fill="#374151" transform="rotate(-15 55 80)"/>
+            <line x1="50" y1="50" x2="60" y2="75" stroke="#374151" stroke-width="4"/>
+        </svg>
+
+        <!-- Vazio (Traço) -->
+        <svg id="svg-empty" viewBox="0 0 100 100" class="w-full h-full opacity-20">
+            <circle cx="50" cy="50" r="10" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 2"/>
+        </svg>
+    </div>
+
+    <script>
+        // --- MOTOR DE ÁUDIO ---
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // Sintetizadores dos Instrumentos
+        function playHiHat(time) {
+            const bufferSize = audioCtx.sampleRate * 0.1; 
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const bandpass = audioCtx.createBiquadFilter();
+            bandpass.type = 'bandpass'; bandpass.frequency.value = 10000;
+            const gain = audioCtx.createGain();
+            noise.connect(bandpass); bandpass.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.5, time); // Volume chimbal
+            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05); // Som curtinho (fechado)
+            noise.start(time);
+        }
+
+        function playSnare(time) {
+            // Ruído da esteira
+            const bufferSize = audioCtx.sampleRate * 0.2; 
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass'; filter.frequency.value = 1000;
+            const noiseGain = audioCtx.createGain();
+            noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+            noiseGain.gain.setValueAtTime(0.6, time);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+            noise.start(time);
+
+            // Corpo do tambor
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.connect(oscGain); oscGain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(250, time);
+            osc.frequency.exponentialRampToValueAtTime(100, time + 0.1);
+            oscGain.gain.setValueAtTime(0.5, time);
+            oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+            osc.start(time); osc.stop(time + 0.2);
+        }
+
+        function playKick(time) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(150, time); // Ataque
+            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5); // Grave descendo
+            gain.gain.setValueAtTime(1, time); // Volume forte
+            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+            osc.start(time); osc.stop(time + 0.5);
+        }
+
+        // Metrônomo Sonoro (Click)
+        function playClick(time, isAccent) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(isAccent ? 1200 : 800, time);
+            gain.gain.setValueAtTime(0.5, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+            osc.start(time); osc.stop(time + 0.05);
+        }
+
+        // --- ESTADO DA APLICAÇÃO ---
+        const STEPS = 8; // 8 colcheias no compasso (1 E 2 E 3 E 4 E)
+        let isPlaying = false;
+        let isMetronomeOn = false;
+        let currentStep = 0;
+        let nextNoteTime = 0.0;
+        let bpm = 60;
+        
+        let grid = {
+            hihat: [0,0,0,0,0,0,0,0],
+            snare: [0,0,0,0,0,0,0,0],
+            kick:  [0,0,0,0,0,0,0,0]
+        };
+
+        const svgHiHat = document.getElementById('svg-hihat').outerHTML;
+        const svgSnare = document.getElementById('svg-snare').outerHTML;
+        const svgKick = document.getElementById('svg-kick').outerHTML;
+        const svgEmpty = document.getElementById('svg-empty').outerHTML;
+
+        // Renderiza botões no Grid
+        function createRow(inst, id, activeSvg) {
+            const container = document.getElementById(id);
+            container.innerHTML = '';
+            grid[inst].forEach((state, i) => {
+                const btn = document.createElement('button');
+                const isMainBeat = i % 2 === 0; // Os números (1, 2, 3, 4)
+                
+                let cls = "grid-btn relative w-full h-16 md:h-20 rounded-xl flex items-center justify-center border-2 overflow-hidden mx-1 ";
+                
+                if (inst === 'hihat') cls += state ? "neon-box-yellow bg-yellow-900/30 border-yellow-500" : (isMainBeat ? "border-slate-600 bg-slate-700/30" : "border-slate-800 bg-slate-800/50 opacity-40");
+                else if (inst === 'snare') cls += state ? "neon-box-blue bg-blue-900/30 border-blue-500" : (isMainBeat ? "border-slate-600 bg-slate-700/30" : "border-slate-800 bg-slate-800/50 opacity-40");
+                else cls += state ? "neon-box-red bg-red-900/30 border-red-500" : (isMainBeat ? "border-slate-600 bg-slate-700/30" : "border-slate-800 bg-slate-800/50 opacity-40");
+
+                btn.className = cls;
+                btn.innerHTML = state ? activeSvg : svgEmpty;
+                btn.id = `c-${inst}-${i}`;
+                btn.onclick = () => { grid[inst][i] ^= 1; render(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function render() {
+            createRow('hihat', 'row-hihat', svgHiHat);
+            createRow('snare', 'row-snare', svgSnare);
+            createRow('kick', 'row-kick', svgKick);
+        }
+
+        function nextNote() {
+            // Em 4/4 com colcheias, cada passo é meia batida (0.5 * tempo da semínima)
+            const secondsPerBeat = 60.0 / bpm;
+            nextNoteTime += 0.5 * secondsPerBeat;
+            currentStep = (currentStep + 1) % STEPS;
+        }
+
+        function scheduleNote(step, time) {
+            // Toca os instrumentos
+            if (grid.kick[step]) playKick(time);
+            if (grid.snare[step]) playSnare(time);
+            if (grid.hihat[step]) playHiHat(time);
+            
+            // Lógica do Metrônomo Sonoro (toca nos tempos 0, 2, 4, 6 que equivalem a 1, 2, 3, 4)
+            if (isMetronomeOn && step % 2 === 0) {
+                const isAccent = (step === 0); // Mais agudo no tempo 1
+                playClick(time, isAccent);
+            }
+
+            // Animações Visuais (com delay para sincronizar com o áudio gerado no futuro)
+            const delay = (time - audioCtx.currentTime) * 1000;
+            setTimeout(() => {
+                updateVisuals(step);
+            }, delay);
+        }
+
+        function updateVisuals(step) {
+            // Atualiza número do tempo na tela (1, 2, 3 ou 4)
+            if (step % 2 === 0) {
+                const beatNumber = (step / 2) + 1;
+                document.getElementById('beat-counter').innerText = beatNumber;
+                
+                // Atualiza luzes do metrônomo visual
+                for(let i=1; i<=4; i++) {
+                    const light = document.getElementById(`light-${i}`);
+                    if(i === beatNumber) {
+                        light.className = "metronome-active w-6 h-6 rounded-full border-2 border-yellow-200 transition-all duration-75";
+                        setTimeout(() => { light.className = "indicator-idle w-6 h-6 rounded-full border-2 border-slate-600 transition-all duration-300"; }, 150);
+                    }
+                }
+            } else {
+                document.getElementById('beat-counter').innerText = "&"; // O "E"
+            }
+
+            // Piscar os botões ativos no grid
+            ['hihat', 'snare', 'kick'].forEach(inst => {
+                const el = document.getElementById(`c-${inst}-${step}`);
+                // Adiciona um highlight leve em toda a coluna
+                if(el) {
+                    const originalBg = el.style.backgroundColor;
+                    el.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                    setTimeout(() => el.style.backgroundColor = originalBg, 100);
+                }
+
+                // Se tiver nota, anima o ícone
+                if (el && grid[inst][step]) {
+                    const svg = el.querySelector('svg');
+                    if(svg) {
+                        svg.classList.add('beat-active');
+                        setTimeout(() => svg.classList.remove('beat-active'), 150);
+                    }
+                }
+            });
+        }
+
+        function scheduler() {
+            // Agenda notas um pouco antes do tempo exato para garantir fluidez
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                scheduleNote(currentStep, nextNoteTime);
+                nextNote();
+            }
+            if (isPlaying) requestAnimationFrame(scheduler);
+        }
+
+        function play() {
+            initAudio();
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playBtn');
+            const txt = document.getElementById('playText');
+            const icon = document.getElementById('playIcon');
+            
+            if (isPlaying) {
+                currentStep = 0;
+                nextNoteTime = audioCtx.currentTime + 0.05;
+                scheduler();
+                btn.classList.replace('from-green-500', 'from-red-500');
+                btn.classList.replace('to-emerald-600', 'to-red-700');
+                btn.classList.replace('hover:from-green-400', 'hover:from-red-400');
+                btn.classList.replace('hover:to-emerald-500', 'hover:to-red-600');
+                icon.innerText = '⏹';
+                txt.innerText = 'PARAR';
+            } else {
+                btn.classList.replace('from-red-500', 'from-green-500');
+                btn.classList.replace('to-red-700', 'to-emerald-600');
+                btn.classList.replace('hover:from-red-400', 'hover:from-green-400');
+                btn.classList.replace('hover:to-red-600', 'hover:to-emerald-500');
+                icon.innerText = '▶';
+                txt.innerText = 'TOCAR';
+                document.getElementById('beat-counter').innerText = "1";
+            }
+        }
+
+        function toggleMetronome() {
+            isMetronomeOn = !isMetronomeOn;
+            const btn = document.getElementById('metronomeBtn');
+            if(isMetronomeOn) {
+                btn.classList.add('btn-metronome-on');
+                btn.classList.remove('bg-slate-700');
+            } else {
+                btn.classList.remove('btn-metronome-on');
+                btn.classList.add('bg-slate-700');
+            }
+        }
+
+        function setBPM(newBpm) {
+            bpm = newBpm;
+            document.getElementById('bpm').value = bpm;
+            document.getElementById('bpmDisplay').innerText = bpm;
+        }
+
+        // --- PRESETS (AULAS) ---
+        // Índice:  0(1), 1(E), 2(2), 3(E), 4(3), 5(E), 6(4), 7(E)
+        function loadPreset(id) {
+            grid.hihat.fill(0); grid.snare.fill(0); grid.kick.fill(0);
+
+            if (id === 1) { 
+                // AULA DA FOTO: Ritmo Campeão (Basic Rock Beat)
+                grid.hihat = [1,1,1,1,1,1,1,1]; // Chimbal em todos
+                grid.kick  = [1,0,0,0,1,0,0,0]; // Bumbo no 1 e 3 (indices 0 e 4)
+                grid.snare = [0,0,1,0,0,0,1,0]; // Caixa no 2 e 4 (indices 2 e 6)
+                setBPM(60);
+            } else if (id === 2) { 
+                // PASSEIO SUAVE: Mais simples para crianças iniciantes
+                grid.hihat = [1,0,1,0,1,0,1,0]; // Chimbal só nos números (Semínimas)
+                grid.kick  = [1,0,0,0,1,0,0,0]; // Bumbo 1 e 3
+                grid.snare = [0,0,1,0,0,0,1,0]; // Caixa 2 e 4
+                setBPM(75);
+            } else if (id === 3) { 
+                // ROCK STAR: Variação legal de Bumbo
+                grid.hihat = [1,1,1,1,1,1,1,1]; 
+                grid.kick  = [1,1,0,0,1,0,0,0]; // Bumbo duplo no 1 e "E" (indices 0 e 1)
+                grid.snare = [0,0,1,0,0,0,1,0]; 
+                setBPM(90);
+            }
+            render();
+        }
+
+        // Eventos
+        document.getElementById('playBtn').onclick = play;
+        document.getElementById('metronomeBtn').onclick = toggleMetronome;
+        document.getElementById('clearBtn').onclick = () => { grid.hihat.fill(0); grid.snare.fill(0); grid.kick.fill(0); render(); };
+        document.getElementById('bpm').oninput = (e) => { setBPM(e.target.value); };
+
+        // Inicialização
+        render();
+        loadPreset(1); // Já começa carregado com a aula da foto!
+    </script>
+</body>
+</html>
